@@ -1,0 +1,19 @@
+---
+spack_ohpc_compilers:
+  - os_pkg: gnu9-compilers-ohpc
+    module: gnu9/9.3.0
+    spack_pkg: gcc@9.3.0
+spack_root: "/home/{{ ansible_user }}/spack"
+spack_version: HEAD
+spack_cmd: "{{ spack_root}}/bin/spack"
+spack_packages: []
+spack_users:
+  - "{{ ansible_user }}"
+spack_module_config:
+  modules:
+    enable:
+      - lmod
+    lmod:
+      core_compilers: "{{ spack_ohpc_compilers | map(attribute='spack_pkg') | list }}"
+      hierarchy:
+        - mpi

@@ -1,0 +1,56 @@
+---
+
+- name: install spack prerequisites
+  package:
+    name: git,python3,make,tar,gzip,bzip2,xz,zstd,patch,curl,unzip
+
+- name: clone spack repo
+  git:
+    repo: https://github.com/spack/spack.git
+    dest: "{{ spack_root }}"
+    version: "{{ spack_version }}"
+    depth: "1"
+
+- name: install ohpc compilers
+  package:
+    name: "{{ item.os_pkg }}"
+  loop: "{{ spack_ohpc_compilers }}"
+
+- name: add ohpc compilers to spack # NB added to root's spack config so installs must use become
+  shell:
+    cmd: "module load {{ item.module }} && {{ spack_cmd }} compiler find" # TODO: idempotent
+    executable: "/usr/bin/bash"
+  register: compiler_find
+  changed_when: "'Found no new compilers' not in compiler_find.stdout"
+  loop: "{{ spack_ohpc_compilers }}"
+  environment:
+    BASH_ENV: /opt/ohpc/admin/lmod/lmod/init/bash 
+    MODULEPATH: /opt/ohpc/pub/modulefiles
+
+- name: install spack packages
+  shell:
+    cmd: "{{ spack_cmd }} install {{ item }}"
+  loop: "{{ spack_packages }}"
+  register: spack_install
+  failed_when: "'failed' in spack_install.stderr or spack_install.rc != 0"
+  changed_when: "'Installing' in spack_install.stdout"
+
+- name: create spack modules config
+  template:
+    dest: "{{ spack_root }}/etc/spack/modules.yaml"
+    src: templates/modules.j2
+
+- name: create module tree
+  shell:
+    cmd: "{{ spack_cmd }} module lmod refresh -y" # TODO: idempotency? think we'd have to hash the tree or something
+
+- name: modify users .bashrc
+  blockinfile:
+    path: /home/{{ item }}/.bashrc # TODO: other users?
+    create: false
+    block: |
+      export SPACK_ROOT={{ spack_root }}
+      . $SPACK_ROOT/share/spack/setup-env.sh
+      module use $SPACK_ROOT/share/spack/lmod/linux*/Core/
+    insertafter: "# User specific aliases and functions"
+  loop: "{{ spack_users }}"

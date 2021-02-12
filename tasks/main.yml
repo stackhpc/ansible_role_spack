@@ -11,18 +11,18 @@
     version: "{{ spack_version }}"
     depth: "1"
 
-- name: install ohpc compilers
+- name: install system-package-manager compiler packages
   package:
-    name: "{{ item.os_pkg }}"
-  loop: "{{ spack_ohpc_compilers }}"
+    name: "{{ item.system_pkg }}"
+  loop: "{{ spack_system_compilers }}"
 
-- name: add ohpc compilers to spack # NB added to root's spack config so installs must use become
+- name: add system-package-manager compilers to spack # NB added to root's spack config so installs must use become
   shell:
     cmd: "module load {{ item.module }} && {{ spack_cmd }} compiler find" # TODO: idempotent
     executable: "/usr/bin/bash"
   register: compiler_find
   changed_when: "'Found no new compilers' not in compiler_find.stdout"
-  loop: "{{ spack_ohpc_compilers }}"
+  loop: "{{ spack_system_compilers }}"
   environment:
     BASH_ENV: /opt/ohpc/admin/lmod/lmod/init/bash 
     MODULEPATH: /opt/ohpc/pub/modulefiles
@@ -44,7 +44,7 @@
   shell:
     cmd: "{{ spack_cmd }} module lmod refresh -y" # TODO: idempotency? think we'd have to hash the tree or something
 
-- name: modify users .bashrc
+- name: modify users .bashrc # FIXME: really assumes /home is on shared FS too.
   blockinfile:
     path: /home/{{ item }}/.bashrc # TODO: other users?
     create: false

@@ -1,4 +1,4 @@
-Role Name
+stackhpc.spack
 =========
 
 Install and configure the [Spack](https://spack.readthedocs.io/en/latest/index.html) souce-based package manager, and optionally packages using it.

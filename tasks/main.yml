@@ -27,23 +27,6 @@
     BASH_ENV: /opt/ohpc/admin/lmod/lmod/init/bash 
     MODULEPATH: /opt/ohpc/pub/modulefiles
 
-- name: install spack packages
-  shell:
-    cmd: "{{ spack_cmd }} install {{ item }}"
-  loop: "{{ spack_packages }}"
-  register: spack_install
-  failed_when: "'failed' in spack_install.stderr or spack_install.rc != 0"
-  changed_when: "'Installing' in spack_install.stdout"
-
-- name: create spack modules config
-  template:
-    dest: "{{ spack_root }}/etc/spack/modules.yaml"
-    src: templates/modules.j2
-
-- name: create module tree
-  shell:
-    cmd: "{{ spack_cmd }} module lmod refresh -y" # TODO: idempotency? think we'd have to hash the tree or something
-
 - name: modify users .bashrc # FIXME: really assumes /home is on shared FS too.
   blockinfile:
     path: /home/{{ item }}/.bashrc # TODO: other users?
@@ -54,3 +37,20 @@
       module use $SPACK_ROOT/share/spack/lmod/linux*/Core/
     insertafter: "# User specific aliases and functions"
   loop: "{{ spack_users }}"
+
+- name: create spack modules config
+  template:
+    dest: "{{ spack_root }}/etc/spack/modules.yaml"
+    src: templates/modules.j2
+
+- name: install spack packages
+  shell:
+    cmd: "{{ spack_cmd }} install {{ item }}"
+  loop: "{{ spack_packages }}"
+  register: spack_install
+  failed_when: "'failed' in spack_install.stderr or spack_install.rc != 0"
+  changed_when: "'Installing' in spack_install.stdout"
+
+- name: create module tree
+  shell:
+    cmd: "{{ spack_cmd }} module lmod refresh -y" # TODO: idempotency? think we'd have to hash the tree or something

@@ -1,7 +1,7 @@
 stackhpc.spack
 =========
 
-Install and configure the [Spack](https://spack.readthedocs.io/en/latest/index.html) souce-based package manager, and optionally packages using it.
+Install and configure the [Spack](https://spack.readthedocs.io/en/latest/index.html) source-based package manager, and optionally packages using it.
 
 - `TODO:` provide a way to add spack-installed compilers (not openhpc-packaged ones) automatically.
 - `TODO:` uninstall packages removed from the list?

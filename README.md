@@ -14,7 +14,7 @@ Requirements
 
 - Must be run with `become: true`.
 - The defaults for `spack_system_compilers` assume OpenHPC v2 system.
-- For installing on a cluster, a shared filesystem is recommended.
+- For installing on a cluster, a shared filesystem and shared `/home` is required.
 
 Role Variables
 --------------
@@ -57,7 +57,7 @@ None.
 Example Playbook
 ----------------
 
-This only needs to be run on the login node (assuming that `spack_root` is set to a location on a cluster-shared filesystem).
+This should be run on any nodes from which you want to be able to build spack packages `spack`, i.e. login nodes for a cluster.
 
 ```yaml
 - hosts: cluster_login  

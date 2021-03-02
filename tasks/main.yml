@@ -4,17 +4,18 @@
   package:
     name: git,python3,make,tar,gzip,bzip2,xz,zstd,patch,curl,unzip
 
+- name: install system-package-manager compiler packages
+  package:
+    name: "{{ item.system_pkg }}"
+  loop: "{{ spack_system_compilers }}"
+
 - name: clone spack repo
   git:
     repo: https://github.com/spack/spack.git
     dest: "{{ spack_root }}"
     version: "{{ spack_version }}"
     depth: "1"
-
-- name: install system-package-manager compiler packages
-  package:
-    name: "{{ item.system_pkg }}"
-  loop: "{{ spack_system_compilers }}"
+  run_once: true
 
 - name: add system-package-manager compilers to spack # NB added to root's spack config so installs must use become
   shell:
@@ -26,22 +27,31 @@
   environment:
     BASH_ENV: /opt/ohpc/admin/lmod/lmod/init/bash 
     MODULEPATH: /opt/ohpc/pub/modulefiles
+  run_once: true
 
-- name: modify users .bashrc # FIXME: really assumes /home is on shared FS too.
+- name: find user's home directory
+  shell:
+    cmd: "getent passwd {{ item }} | cut -d ':' -f 6"
+  loop: "{{ spack_users }}"
+  register: spack_user_homedirs
+
+- name: modify users .bashrc
   blockinfile:
-    path: /home/{{ item }}/.bashrc # TODO: other users?
+    path: "{{ item.stdout }}/.bashrc"
     create: false
     block: |
       export SPACK_ROOT={{ spack_root }}
       . $SPACK_ROOT/share/spack/setup-env.sh
       module use $SPACK_ROOT/share/spack/lmod/linux*/Core/
     insertafter: "# User specific aliases and functions"
-  loop: "{{ spack_users }}"
+  loop: "{{ spack_user_homedirs.results }}"
+  run_once: true # NB: assumes home is on shared filesystem if role run on multiple hosts
 
 - name: create spack modules config
   template:
     dest: "{{ spack_root }}/etc/spack/modules.yaml"
     src: templates/modules.j2
+  run_once: true
 
 - name: install spack packages
   shell:
@@ -50,7 +60,9 @@
   register: spack_install
   failed_when: "'failed' in spack_install.stderr or spack_install.rc != 0"
   changed_when: "'Installing' in spack_install.stdout"
+  run_once: true
 
 - name: create module tree
   shell:
     cmd: "{{ spack_cmd }} module lmod refresh -y" # TODO: idempotency? think we'd have to hash the tree or something
+  run_once: true

@@ -19,7 +19,7 @@
 
 - name: add system-package-manager compilers to spack # NB added to root's spack config so installs must use become
   shell:
-    cmd: "module load {{ item.module }} && {{ spack_cmd }} compiler find" # TODO: idempotent
+    cmd: "module load {{ item.module }} && {{ spack_cmd }} compiler find --scope site" # TODO: idempotent
     executable: "/usr/bin/bash"
   register: compiler_find
   changed_when: "'Found no new compilers' not in compiler_find.stdout"

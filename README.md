@@ -7,7 +7,7 @@ Install and configure the [Spack](https://spack.readthedocs.io/en/latest/index.h
 - `TODO:` uninstall packages removed from the list?
 - `TODO:` run spack selfchecks on first install
 
-After running this for the first time, any users defined in `spack_users` should re-source `~/.bashrc` to make the `spack` command available and update `module avail`.
+After running this for the first time, users should log in again to make the `spack` command available and update `module avail`.
 
 Requirements
 ------------
@@ -31,7 +31,7 @@ The following variables will commonly need changing:
     ```
   
   On an OpenHPC v2 system this installs a version of OpenMPI using the UCX transport layer which integrates with the (OpenHPC-installed) Slurm. Note that `%gcc@9.3.0` requires Spack to use a specific compiler, which is installed from the OpenHPC repositories and configured in spack by the defaults below. While OpenHPC does provide an openmpi+ucx package, it can be hard to integrate this with further Spack packages.
-- `spack_users`: Optional: List of (existing) users to make spack available to by modifying their `.bashrc`. The default is only `{{ ansible_user }}`.
+- `spack_users`: Optional. List of (existing) users to make spack available to by modifying their `.bashrc`. Default is the empty list, in which case a system-wide profile is set to make `spack` available for all bash sessions.
 
 The following variables are unlikely to need changing:
 

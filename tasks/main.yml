@@ -47,6 +47,16 @@
   loop: "{{ spack_user_homedirs.results }}"
   run_once: true # NB: assumes home is on shared filesystem if role run on multiple hosts
 
+- name: modify system profile
+  blockinfile:
+    path: "/etc/profile.d/spack.sh"
+    create: true
+    block: |
+      export SPACK_ROOT={{ spack_root }}
+      . $SPACK_ROOT/share/spack/setup-env.sh
+      module use $SPACK_ROOT/share/spack/lmod/linux*/Core/
+  when: spack_users | length == 0
+
 - name: create spack modules config
   template:
     dest: "{{ spack_root }}/etc/spack/modules.yaml"

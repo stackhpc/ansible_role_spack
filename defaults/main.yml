@@ -7,8 +7,7 @@ spack_root: "/home/{{ ansible_user }}/spack"
 spack_version: HEAD
 spack_cmd: "{{ spack_root}}/bin/spack"
 spack_packages: []
-spack_users:
-  - "{{ ansible_user }}"
+spack_users: []
 spack_module_config:
   modules:
     enable:

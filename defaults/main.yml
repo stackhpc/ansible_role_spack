@@ -8,11 +8,14 @@ spack_version: HEAD
 spack_cmd: "{{ spack_root}}/bin/spack"
 spack_packages: []
 spack_users: []
-spack_module_config:
+spack_module_config: |
   modules:
-    enable:
+    enable::
       - lmod
     lmod:
-      core_compilers: "{{ spack_system_compilers | map(attribute='spack_pkg') | list }}"
+      core_compilers:
+  {% for compiler in spack_system_compilers | map(attribute='spack_pkg') %}
+        - {{ compiler }}
+  {% endfor %}
       hierarchy:
         - mpi

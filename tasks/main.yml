@@ -58,9 +58,9 @@
   when: spack_users | length == 0
 
 - name: create spack modules config
-  template:
+  copy:
     dest: "{{ spack_root }}/etc/spack/modules.yaml"
-    src: templates/modules.j2
+    content: "{{ spack_module_config }}"
   run_once: true
 
 - name: install spack packages

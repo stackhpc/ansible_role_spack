@@ -44,6 +44,8 @@ The following variables are unlikely to need changing:
     spack_pkg: gcc@9.3.0        # what `spack compiler list` shows this compiler as
   ```
   
+  Note that values for `system_pkg` and `module` may be left empty if the compiler is already installed in the base image and/or does not have a module, but those keys must still exist.
+
   For OpenHPC v2 systems the above is currently the only compiler available without additional licences (see Table 6 of OpenHPC [installation guide](https://github.com/openhpc/ohpc/releases/download/v2.0.GA/Install_guide-CentOS8-Warewulf-SLURM-2.0-aarch64.pdf), so the default is appropriate on such systems.
 
 - `spack_module_config`: Optional. YAML for spack's `modules.yml` configuration file. The default configures `lmod` module system (as used by OpenHPC) with all compilers in `spack_system_compilers` as core. (Note this is provided as a block rather than actual yaml due to some non-standard Spack yaml such as "::")

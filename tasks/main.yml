@@ -72,13 +72,6 @@
   changed_when: "'Installing' in spack_install_compilers.stdout"
   run_once: true
 
-- name: debug
-  shell:
-    cmd: "{{ spack_cmd }} location -i {{ item }}"
-    executable: "/usr/bin/bash"
-  loop: "{{ spack_compilers }}"
-  run_once: true
-
 - name: add spack_compilers compilers to spack # NB added to root's spack config so installs must use become
   shell:
     cmd: "{{ spack_cmd }} compiler find --scope site $({{ spack_cmd }} location -i {{ item }})"
@@ -87,7 +80,6 @@
   changed_when: "'Found no new compilers' not in spack_compiler_find.stdout"
   loop: "{{ spack_compilers }}"
   run_once: true
-  tags: debug
 
 - name: install spack packages
   shell:

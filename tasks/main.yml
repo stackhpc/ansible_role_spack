@@ -19,7 +19,7 @@
 
 - name: add system-package-manager compilers to spack # NB added to root's spack config so installs must use become
   shell:
-    cmd: "{% if item.module %}module load {{ item.module }} && {% endif %}{{ spack_cmd }} compiler find --scope site" # TODO: idempotent
+    cmd: "{% if item.module %}module load {{ item.module }} && {% endif %}{{ spack_cmd }} compiler find --scope site"
     executable: "/usr/bin/bash"
   register: compiler_find
   changed_when: "'Found no new compilers' not in compiler_find.stdout"
@@ -63,13 +63,39 @@
     content: "{{ spack_module_config }}"
   run_once: true
 
+- name: install spack compilers
+  shell:
+    cmd: "{{ spack_cmd }} install {{ item }}"
+  loop: "{{ spack_compilers }}"
+  register: spack_install_compilers
+  failed_when: "'failed' in spack_install_compilers.stderr or spack_install_compilers.rc != 0"
+  changed_when: "'Installing' in spack_install_compilers.stdout"
+  run_once: true
+
+- name: debug
+  shell:
+    cmd: "{{ spack_cmd }} location -i {{ item }}"
+    executable: "/usr/bin/bash"
+  loop: "{{ spack_compilers }}"
+  run_once: true
+
+- name: add spack_compilers compilers to spack # NB added to root's spack config so installs must use become
+  shell:
+    cmd: "{{ spack_cmd }} compiler find --scope site $({{ spack_cmd }} location -i {{ item }})"
+    executable: "/usr/bin/bash"
+  register: spack_compiler_find
+  changed_when: "'Found no new compilers' not in spack_compiler_find.stdout"
+  loop: "{{ spack_compilers }}"
+  run_once: true
+  tags: debug
+
 - name: install spack packages
   shell:
     cmd: "{{ spack_cmd }} install {{ item }}"
   loop: "{{ spack_packages }}"
-  register: spack_install
-  failed_when: "'failed' in spack_install.stderr or spack_install.rc != 0"
-  changed_when: "'Installing' in spack_install.stdout"
+  register: spack_install_packages
+  failed_when: "'failed' in spack_install_packages.stderr or spack_install_packages.rc != 0"
+  changed_when: "'Installing' in spack_install_packages.stdout"
   run_once: true
 
 - name: create module tree

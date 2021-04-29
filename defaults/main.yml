@@ -6,6 +6,7 @@ spack_system_compilers:
 spack_root: "/home/{{ ansible_user }}/spack"
 spack_version: HEAD
 spack_cmd: "{{ spack_root}}/bin/spack"
+spack_compilers: []
 spack_packages: []
 spack_users: []
 spack_module_config: |

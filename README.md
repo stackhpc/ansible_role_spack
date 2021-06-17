@@ -22,7 +22,7 @@ Role Variables
 The following variables will commonly need changing:
 
 - `spack_root`: Optional. Path to install spack to. Default `/home/{{ ansible_user }}/spack` (note a final directory is included) - for a cluster this should be on a shared filesystem.
-- `spack_version`: Optional. Git tag etc of spack version to install. Default `HEAD`.
+- `spack_version`: Optional. Git tag etc of spack version to install. Default `v0.16.2`.
 - `spack_compilers`: Optional. List of [spack specs](https://spack.readthedocs.io/en/latest/basic_usage.html#specs-dependencies) describing compiler packages to install using spack. Default is an empty list. Note that removing packages from this list does not uninstall them.
 - `spack_packages`: As for `spack_compilers` but for non-compiler packages.
 

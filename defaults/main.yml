@@ -11,13 +11,12 @@ spack_packages: []
 spack_users: []
 spack_module_config: |
   modules:
-    default:
-      enable::
-        - lmod
-      lmod:
-        core_compilers:
+    enable::
+      - lmod
+    lmod:
+      core_compilers:
   {% for compiler in spack_system_compilers | map(attribute='spack_pkg') %}
-          - {{ compiler }}
+        - {{ compiler }}
   {% endfor %}
-        hierarchy:
-          - mpi
+      hierarchy:
+        - mpi

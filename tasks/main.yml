@@ -16,6 +16,7 @@
     version: "{{ spack_version }}"
     depth: "1"
   run_once: true
+  become_user: "{{ spack_owner }}"
 
 - name: add system-package-manager compilers to spack # NB added to root's spack config so installs must use become
   shell:
@@ -28,6 +29,7 @@
     BASH_ENV: /opt/ohpc/admin/lmod/lmod/init/bash 
     MODULEPATH: /opt/ohpc/pub/modulefiles
   run_once: true
+  become_user: "{{ spack_owner }}"
 
 - name: find user's home directory
   shell:
@@ -62,6 +64,7 @@
     dest: "{{ spack_root }}/etc/spack/modules.yaml"
     content: "{{ spack_module_config }}"
   run_once: true
+  become_user: "{{ spack_owner }}"
 
 - name: install spack compilers
   shell:
@@ -71,6 +74,7 @@
   failed_when: "'failed' in spack_install_compilers.stderr or spack_install_compilers.rc != 0"
   changed_when: "'Installing' in spack_install_compilers.stdout"
   run_once: true
+  become_user: "{{ spack_owner }}"
 
 - name: add spack_compilers compilers to spack # NB added to root's spack config so installs must use become
   shell:
@@ -80,6 +84,7 @@
   changed_when: "'Found no new compilers' not in spack_compiler_find.stdout"
   loop: "{{ spack_compilers }}"
   run_once: true
+  become_user: "{{ spack_owner }}"
 
 - name: install spack packages
   shell:
@@ -89,8 +94,10 @@
   failed_when: "'failed' in spack_install_packages.stderr or spack_install_packages.rc != 0"
   changed_when: "'Installing' in spack_install_packages.stdout"
   run_once: true
+  become_user: "{{ spack_owner }}"
 
 - name: create module tree
   shell:
     cmd: "{{ spack_cmd }} module lmod refresh -y" # TODO: idempotency? think we'd have to hash the tree or something
   run_once: true
+  become_user: "{{ spack_owner }}"

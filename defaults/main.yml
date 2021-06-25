@@ -4,6 +4,7 @@ spack_system_compilers:
     module: gnu9/9.3.0
     spack_pkg: gcc@9.3.0
 spack_root: "/home/{{ ansible_user }}/spack"
+spack_owner: "{{ ansible_user }}"
 spack_version: v0.16.2
 spack_cmd: "{{ spack_root}}/bin/spack"
 spack_compilers: []
